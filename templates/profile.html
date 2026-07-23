@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}{{ username }}'s Profile | Message Board{% endblock %}
+
+{% block content %}
+    <h2>{{ username }}'s Profile</h2>
+    <br>
+    <a href="{{ url_for('home') }}" class="button-like">Back to Home</a>
+    <br>
+    <div class="profile-follow-info" style="margin: 20px 0; display: flex; gap: 40px; flex-wrap: wrap;">
+        <div>
+            <strong>Followers</strong> ({{ users[username].followers|length }})
+            {% if users[username].followers %}
+                <div class="profile-follow-list" style="margin-top: 8px;">
+                    {% for follower in users[username].followers %}
+                        <a href="{{ url_for('profile', username=follower) }}">{{ follower }}</a>{% if not loop.last %}, {% endif %}
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="profile-follow-list" style="margin-top: 8px; color: #666;">No followers yet.</div>
+            {% endif %}
+        </div>
+
+        <div>
+            <strong>Following</strong> ({{ users[username].following|length }})
+            {% if users[username].following %}
+                <div class="profile-follow-list" style="margin-top: 8px;">
+                    {% for following in users[username].following %}
+                        <a href="{{ url_for('profile', username=following) }}">{{ following }}</a>{% if not loop.last %}, {% endif %}
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="profile-follow-list" style="margin-top: 8px; color: #666;">Not following anyone yet.</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <h3>Messages:</h3>
+    {% for msg in messages %}
+        <div class="message">
+            <div class="message-author">
+                {% set author = users.get(msg.username) %}
+                {% if author and author.profile_picture %}
+                    <img src="{{ url_for('uploaded_file', filename=author.profile_picture) }}" alt="{{ msg.username }}" class="post-avatar">
+                {% else %}
+                    <div class="post-avatar-placeholder">{{ msg.username[0].upper() }}</div>
+                {% endif %}
+                <strong>{{ msg.username }}</strong>
+            </div>
+            {% if msg.image_filenames %}
+                <div class="message-image">
+                    {% for img in msg.image_filenames %}
+                        <img src="{{ url_for('static', filename='uploads/' + img) }}" alt="Message Image">
+                    {% endfor %}
+                </div>
+            {% endif %}
+            <div class="post-meta">
+                <form action="{{ url_for('like_message', message_index=loop.index0) }}" method="post" class="d-inline">
+                    <button type="submit" class="btn btn-sm {% if loop.index0 in session.get('liked_messages', []) %}btn-success{% else %}btn-outline-success{% endif %}">
+                        Like ({{ msg.likes }})
+                    </button>
+                </form>
+                <a href="{{ url_for('profile', username=msg.username) }}" style="display:inline;">View Profile</a>
+                {# Determine global index of this message in the full messages list #}
+                {% set global_index = messages.index(msg) if msg in messages else None %}
+                {% if global_index is not none %}
+                    {% if global_index in users[session['username']].favorites %}
+                        <form method="POST" action="{{ url_for('unfavorite_message', message_index=global_index) }}" style="display:inline;">
+                            <button type="submit">Remove from Favorites</button>
+                        </form>
+                    {% else %}
+                        <form method="POST" action="{{ url_for('favorite_message', message_index=global_index) }}" style="display:inline;">
+                            <button type="submit">Add to Favorites</button>
+                        </form>
+                    {% endif %}
+                    {% if msg.username == session['username'] %}
+                        <span style="margin: 0 5px;">|</span>
+                        <a href="{{ url_for('edit_message', message_index=global_index) }}" style="display:inline;">✏️ Edit</a>
+                        <span style="margin: 0 5px;">|</span>
+                        <form method="POST" action="{{ url_for('delete_message', message_index=global_index) }}" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this message?');">
+                            <button type="submit" style="background: none; border: none; color: #0a66c2; cursor: pointer; padding: 0; font-size: 14px;">🗑️ Delete</button>
+                        </form>
+                    {% endif %}
+                {% endif %}
+                <br>
+                Posted on {{ msg.timestamp.strftime('%B %d, %Y, at %H:%M') }}
+            </div>
+            <strong>{{ msg.username }}</strong>: {{ msg.message }}
+            <br>
+            <small>Likes: {{ msg.likes }}</small>
+        </div>
+    {% endfor %}
+{% endblock %}

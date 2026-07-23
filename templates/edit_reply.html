@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Reply | Message Board{% endblock %}
+
+{% block content %}
+    <h2>Edit Reply</h2>
+    
+    <div style="max-width: 600px; margin: 20px auto;">
+        <form method="POST" action="{{ url_for('edit_reply', message_index=message_index, reply_index=reply_index) }}">
+            <div style="margin-bottom: 15px;">
+                <label for="reply"><strong>Reply Text:</strong></label><br>
+                <textarea name="reply" id="reply" required style="width: 100%; height: 150px; padding: 10px; border: 1px solid #dddfe2; border-radius: 5px; font-family: Arial, sans-serif;">{{ reply_content }}</textarea>
+            </div>
+            
+            <div style="display: flex; gap: 10px;">
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+                <a href="{{ request.referrer or url_for('home') }}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+        
+        <hr style="margin-top: 30px; margin-bottom: 20px;">
+        
+        <h4>Reply Info:</h4>
+        <p><strong>Posted by:</strong> {{ reply_author }}</p>
+    </div>
+{% endblock %}

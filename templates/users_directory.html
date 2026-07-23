@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Users Directory | Message Board{% endblock %}
+
+{% block heaad %}
+{% endblock %}
+
+{% block content %}
+    <h2>Users Directory</h2>
+    
+    {% if user_list %}
+        <div class="users-grid">
+            {% for user in user_list %}
+                {% if user.username != current_user %}
+                    <div class="user-card">
+                        <div class="user-card-header">
+                            {% if user.profile_picture %}
+                                <img src="{{ url_for('static', filename='uploads/' ~ user.profile_picture) }}" alt="{{ user.username }}" class="user-avatar">
+                            {% else %}
+                                <img src="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ccircle cx=%2250%22 cy=%2250%22 r=%2250%22 fill=%22%231877f2%22/%3E%3Ctext x=%2250%22 y=%2250%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22white%22 font-size=%2240%22 font-weight=%22bold%22%3E{{ user.username[0].upper() }}%3C/text%3E%3C/svg%3E" alt="{{ user.username }}" class="user-avatar">
+                            {% endif %}
+                        </div>
+                        
+                        <div class="user-card-body">
+                            <h3 class="user-username">{{ user.username }}</h3>
+                            
+                            {% if user.bio %}
+                                <p class="user-bio">{{ user.bio }}</p>
+                            {% else %}
+                                <p class="user-bio user-bio-empty"><em>No bio</em></p>
+                            {% endif %}
+                            
+                            <div class="user-stats">
+                                <div class="stat">
+                                    <span class="stat-count">{{ user.followers|length }}</span>
+                                    <span class="stat-label">Followers</span>
+                                </div>
+                                <div class="stat">
+                                    <span class="stat-count">{{ user.following|length }}</span>
+                                    <span class="stat-label">Following</span>
+                                </div>
+                            </div>
+                            
+                            <div class="user-actions">
+                                {% if user.username in users[current_user].following %}
+                                    <form method="POST" action="{{ url_for('unfollow_user', username=user.username) }}" style="display: inline;">
+                                        <button type="submit" class="btn btn-unfollow">Unfollow</button>
+                                    </form>
+                                {% else %}
+                                    <form method="POST" action="{{ url_for('follow_user', username=user.username) }}" style="display: inline;">
+                                        <button type="submit" class="btn btn-follow">Follow</button>
+                                    </form>
+                                {% endif %}
+                                
+                                <a href="{{ url_for('profile', username=user.username) }}" class="btn btn-view-profile">View Profile</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>No users found.</p>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Private Messages | Message Board{% endblock %}
+
+{% block content %}
+<main>
+    <h2>Admin — Private Messages</h2>
+    <p>List of all private messages. You can delete any private message.</p>
+    <a href="{{ url_for('admin_panel') }}" class="button-like">Back to Admin</a>
+    
+    <table style="width:100%; border-collapse: collapse;">
+        <thead>
+            <tr>
+                <th style="text-align:left; padding:8px; border-bottom:1px solid #ddd;">Index</th>
+                <th style="text-align:left; padding:8px; border-bottom:1px solid #ddd;">Sender</th>
+                <th style="text-align:left; padding:8px; border-bottom:1px solid #ddd;">Receiver</th>
+                <th style="text-align:left; padding:8px; border-bottom:1px solid #ddd;">Message</th>
+                <th style="text-align:left; padding:8px; border-bottom:1px solid #ddd;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for idx, pm in private_messages|reverse %}
+                <tr>
+                    <td style="padding:8px; border-bottom:1px solid #eee;">{{ idx }}</td>
+                    <td style="padding:8px; border-bottom:1px solid #eee;">{{ pm.sender }}</td>
+                    <td style="padding:8px; border-bottom:1px solid #eee;">{{ pm.receiver }}</td>
+                    <td style="padding:8px; border-bottom:1px solid #eee;">
+                        <div class="pm-admin-message">{{ pm.message | nl2br }}</div>
+                        {% if pm.images %}
+                            <div class="pm-admin-images">
+                                {% for img in pm.images %}
+                                    <div style="margin-top:6px;">
+                                        <img src="{{ url_for('uploaded_file', filename=img) }}" alt="pm image" style="max-height:120px; max-width:200px; border-radius:6px;">
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </td>
+                    <td style="padding:8px; border-bottom:1px solid #eee;">
+                        <form method="POST" action="{{ url_for('admin_delete_private', pm_index=idx) }}" style="display:inline;">
+                            <button type="submit" onclick="return confirm('Delete private message #{{ idx }}?')">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</main>
+{% endblock %}

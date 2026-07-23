@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Messages | Message Board{% endblock %}
+
+{% block content %}
+<main>
+    <h2>Admin — Messages</h2>
+    <p>List of all public messages. You can delete any message or its replies.</p>
+    <a href="{{ url_for('admin_panel') }}" class="button-like">Back to Admin</a>
+    
+    <div class="admin-messages-container">
+        {% for idx, msg in messages %}
+            <div class="admin-message-item">
+                <!-- Message Header with Delete Button -->
+                <div class="admin-message-header">
+                    <span class="admin-message-index">#{{ idx }}</span>
+                    <strong>{{ msg.username }}:</strong> 
+                    <span class="admin-message-text">{{ msg.message | nl2br | hashtag_links }}</span>
+                    <form method="POST" action="{{ url_for('admin_delete_message', message_index=idx) }}" style="display:inline;">
+                        <button type="submit" class="admin-delete-btn" onclick="return confirm('Delete message #{{ idx }}?')">Delete</button>
+                    </form>
+                </div>
+                
+                <!-- Replies Section -->
+                {% if msg.replies %}
+                    <div class="admin-replies-section">
+                        {% for reply_idx, reply in enumerate(msg.replies) %}
+                            <div class="admin-reply-item">
+                                <span class="admin-reply-bullet">—</span>
+                                <span class="admin-reply-text">{{ reply | nl2br | hashtag_links }}</span>
+                                <form method="POST" action="{{ url_for('admin_delete_reply', message_index=idx, reply_index=reply_idx) }}" style="display:inline;">
+                                    <button type="submit" class="admin-delete-reply-btn" onclick="return confirm('Delete this reply?')">Delete</button>
+                                </form>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+</main>
+{% endblock %}

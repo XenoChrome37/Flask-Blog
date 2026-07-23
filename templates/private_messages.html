@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Private Messages | Message Board{% endblock %}
+
+{% block content %}
+    <h2>Private Messages</h2>
+
+    <p><a href="{{ url_for('home') }}" class="button-like">Back to Home</a></p>
+
+    <h3>Send a Message</h3>
+    <form id="pmForm" method="POST" action="{{ url_for('private_messages') }}" enctype="multipart/form-data">
+        <label for="receiver">To:</label>
+        <input type="text" id="userSearchInput" placeholder="Search users...">
+        <div id="userList">
+            {% for user in users %}
+                <div class="userItem" data-username="{{ user }}">{{ user }}</div>
+            {% endfor %}
+        </div>
+        <input type="hidden" id="selectedReceiver" name="receiver" required>
+        <span id="selectedUsername"></span><br><br>
+
+        <label for="message">Message:</label><br>
+        <textarea name="message" id="pmMessage" rows="4" cols="50" required></textarea><br><br>
+
+        <label for="pm_images">Attach images (optional):</label><br>
+        <input type="file" id="pm_images" name="pm_images" accept="image/*" multiple><br><br>
+
+        <button type="submit" id="submitBtn">Send Message</button>
+        <span id="submitStatus"></span>
+    </form>
+
+    <h3>Your Messages</h3>
+    {% if messages %}
+        <div class="pm-container" data-username="{{ session.get('username', '') }}">
+            {% for msg in messages %}
+                <div class="pm-box {% if msg.sender == session['username'] %}pm-sent{% else %}pm-received{% endif %}" data-id="{{ msg.id }}">
+                    <div class="pm-meta">
+                        {% if msg.sender == session['username'] %}
+                            <span class="pm-label">To:</span>
+                            <span class="pm-user">{{ msg.receiver }}</span>
+                        {% else %}
+                            <span class="pm-label">From:</span>
+                            <span class="pm-user">{{ msg.sender }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="pm-body">{{ msg.message | nl2br }}</div>
+                    {% if msg.images %}
+                        <div class="pm-images">
+                            {% for img in msg.images %}
+                                <div class="message-image">
+                                    <img src="{{ url_for('uploaded_file', filename=img) }}" alt="pm image">
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+
+        <script src="{{ url_for('static', filename='js/private_messages.js') }}"></script>
+        
+    {% else %}
+        <p>No private messages.</p>
+    {% endif %}
+    
+{% endblock %}

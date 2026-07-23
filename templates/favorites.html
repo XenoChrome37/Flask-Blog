@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}Favorites | Message Board{% endblock %}
+
+{% block content %}
+    <main>
+        <h2>My Favorite Messages</h2>
+        <a href="{{ url_for('home') }}" class="button-like">Back to Home</a>
+        {% if messages %}
+            {% for msg, idx in zip(messages, indices) %}
+                {% set current_username_lower = session['username']|lower %}
+                {% set message_lower = msg.message|lower %}
+                <div class="message {% if '@' + current_username_lower in message_lower or '@all' in message_lower %}mentioned{% endif %}">
+                    <div class="message-author">
+                        {% set author = users.get(msg.username) %}
+                        {% if author and author.profile_picture %}
+                            <img src="{{ url_for('uploaded_file', filename=author.profile_picture) }}" alt="{{ msg.username }}" class="post-avatar">
+                        {% else %}
+                            <div class="post-avatar-placeholder">{{ msg.username[0].upper() }}</div>
+                        {% endif %}
+                        <strong>{{ msg.username }}</strong>
+                    </div>
+                    {{ msg.message | nl2br }}
+                    {% if msg.image_filenames %}
+                        <div class="message-image">
+                            {% for img in msg.image_filenames %}
+                                <img src="{{ url_for('static', filename='uploads/' + img) }}" alt="Message Image">
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    <br>
+                    <div class="post-meta">
+                        <form action="{{ url_for('like_message', message_index=idx) }}" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-sm {% if idx in session.get('liked_messages', []) %}btn-success{% else %}btn-outline-success{% endif %}">
+                                Like ({{ msg.likes }})
+                            </button>
+                        </form>
+                        <a href="{{ url_for('profile', username=msg.username) }}" style="display:inline;">View Profile</a>
+                        <form method="POST" action="{{ url_for('unfavorite_message', message_index=idx) }}?source=favorites" style="display:inline;">
+                            <button type="submit">Remove from Favorites</button>
+                        </form>
+                        {% if msg.username == session['username'] %}
+                            <span style="margin: 0 5px;">|</span>
+                            <a href="{{ url_for('edit_message', message_index=idx) }}" style="display:inline;">✏️ Edit</a>
+                            <span style="margin: 0 5px;">|</span>
+                            <form method="POST" action="{{ url_for('delete_message', message_index=idx) }}" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this message?');">
+                                <button type="submit" style="background: none; border: none; color: #0a66c2; cursor: pointer; padding: 0; font-size: 14px;">🗑️ Delete</button>
+                            </form>
+                        {% endif %}
+                        <br>
+                        Posted on {{ msg.timestamp.strftime('%B %d, %Y, at %H:%M') }}
+                    </div>
+                    
+                    <!-- Reply Section -->
+                    <div class="replies" style="max-height: 100px; overflow-y: auto; word-wrap: break-word;">
+                        {% if msg.replies %}
+                            {% for reply in msg.replies %}
+                                {% set reply_author = reply.split(': ', 1)[0] if ': ' in reply else '' %}
+                                <div class="reply">
+                                    {{ reply | nl2br }}
+                                    {% if reply_author == session['username'] %}
+                                        <div style="margin-top: 5px; font-size: 12px;">
+                                            <a href="{{ url_for('edit_reply', message_index=idx, reply_index=loop.index0) }}" style="color: #0a66c2;">✏️ Edit</a>
+                                            <span style="margin: 0 5px;">|</span>
+                                            <form method="POST" action="{{ url_for('delete_reply', message_index=idx, reply_index=loop.index0) }}" style="display:inline;" onsubmit="return confirm('Delete this reply?');">
+                                                <button type="submit" style="background: none; border: none; color: #0a66c2; cursor: pointer; padding: 0; font-size: 12px;">🗑️ Delete</button>
+                                            </form>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    <form method="POST" action="{{ url_for('reply', message_index=idx) }}" class="reply-form">
+                        <div class="input-group">
+                            <input type="text" name="reply" class="form-control" placeholder="Write your reply here..." required>
+                            <button type="submit" class="btn btn-primary">Reply</button>
+                        </div>
+                    </form>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </main>
+{% endblock %}

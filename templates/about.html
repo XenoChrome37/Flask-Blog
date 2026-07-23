@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}About | Message Board{% endblock %}
+
+{% block content %}
+    <h2>About This Application</h2>
+    <p>Welcome to <strong>Message Board</strong>, a user-friendly web application built with Flask. This platform allows users to:</p>
+    <ul>
+        <li>✅ Sign up and log in securely</li>
+        <li>✅ Post messages and share thoughts</li>
+        <li>✅ Like or unlike messages to show appreciation</li>
+        <li>✅ Reply to messages and engage in discussions</li>
+    </ul>
+    <p>Designed for simplicity and ease of use, this message board is a place where users can express themselves, connect with others, and engage in meaningful conversations.</p>
+
+    <h3>Why This Project?</h3>
+    <p>The goal of this project is to create a simple and effective communication platform. Whether you're here to share ideas, seek advice, or just chat, this message board provides a space for open discussions. As the project evolves, new features may be introduced to enhance user experience.</p>
+
+    <h3>About the Creator</h3>
+    <p>Hi, I'm <strong>WillliAm</strong>, an aspiring web developer passionate about building web applications and exploring new technologies. This project is part of my learning journey, and I’m constantly working on improving it.</p>
+    <p>If you have suggestions, feedback, or just want to say hi, feel free to reach out!</p>
+
+    <a href="{{ url_for('home') }}" class="button-like">Back to Home</a>
+{% endblock %}

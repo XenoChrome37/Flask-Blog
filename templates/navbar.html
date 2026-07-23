@@ -1,0 +1,21 @@
+<nav class="navbar" role="navigation" aria-label="Bottom navigation">
+    <a href="{{ url_for('home') }}" class="navbar-item {% if request.endpoint == 'home' %}active{% endif %}" aria-label="Home">
+        <i class="fas fa-home"></i>
+        <span>Home</span>
+    </a>
+    <a href="{{ url_for('users_directory') }}" class="navbar-item {% if request.endpoint == 'users_directory' %}active{% endif %}" aria-label="Users">
+        <i class="fas fa-users"></i>
+        <span>Users</span>
+    </a>
+    <a href="{{ url_for('my_profile') }}" class="navbar-item {% if request.endpoint == 'my_profile' %}active{% endif %}" aria-label="Profile">
+        <i class="fas fa-user-circle"></i>
+        <span>Profile</span>
+    </a>
+    <a href="{{ url_for('private_messages') }}" class="navbar-item {% if request.endpoint == 'private_messages' %}active{% endif %}" aria-label="Messages" style="position: relative;">
+        <i class="fas fa-envelope"></i>
+        <span>Messages</span>
+        {% if unread_count and unread_count > 0 %}
+            <span class="nav-unread-dot"></span>
+        {% endif %}
+    </a>
+</nav>

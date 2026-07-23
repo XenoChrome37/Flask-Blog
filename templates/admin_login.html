@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Login | Message Board{% endblock %}
+
+{% block content %}
+<main>
+    <h2>Admin Access</h2>
+    <p>Enter the admin password to continue.</p>
+    <form method="POST" action="{{ url_for('admin_panel') }}">
+        <input type="password" name="admin_password" placeholder="Admin password" required>
+        <button type="submit">Enter</button>
+    </form>
+    <a href="{{ url_for('home') }}" class="button-like">Back to Home</a>
+</main>
+{% endblock %}

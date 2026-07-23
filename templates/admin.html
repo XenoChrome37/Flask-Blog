@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Panel | Message Board{% endblock %}
+
+{% block content %}
+    <main>
+        <h2>Admin Panel — Users</h2>
+        <p>Below is the list of registered users. You can delete accounts (admin cannot be deleted).</p>
+        <a href="{{ url_for('home') }}" class="button-like">Back to Home</a>
+        
+        <p>
+            <a href="{{ url_for('admin_messages') }}" class="button-like">Manage Messages</a>
+            <a href="{{ url_for('admin_private_messages') }}" class="button-like">Manage Private Messages</a>
+            <a href="{{ url_for('admin_logout') }}" class="button-like">Admin Logout</a>
+        </p>
+        <table style="width:100%; border-collapse: collapse;">
+            <thead>
+                <tr>
+                    <th style="text-align:left; padding:8px; border-bottom:1px solid #ddd;">Username</th>
+                    <th style="text-align:left; padding:8px; border-bottom:1px solid #ddd;">Bio</th>
+                    <th style="text-align:left; padding:8px; border-bottom:1px solid #ddd;">Status</th>
+                    <th style="text-align:left; padding:8px; border-bottom:1px solid #ddd;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in users_list %}
+                    <tr>
+                        <td style="padding:8px; border-bottom:1px solid #eee;">{{ u.username }}</td>
+                        <td style="padding:8px; border-bottom:1px solid #eee;">{{ u.bio }}</td>
+                        <td style="padding:8px; border-bottom:1px solid #eee;">
+                            {% set is_banned = u.banned if u.banned is defined else False %}
+                            {% if is_banned %}
+                                <span style="color: #e02424; font-weight: bold; background-color: #ffe6e6; padding: 4px 8px; border-radius: 4px; display: inline-block;">Banned</span>
+                            {% else %}
+                                <span style="color: #28a745; font-weight: 500; background-color: #e6f7e6; padding: 4px 8px; border-radius: 4px; display: inline-block;">Active</span>
+                            {% endif %}
+                        </td>
+                        <td style="padding:8px; border-bottom:1px solid #eee;">
+                            {% if u.username != 'admin' %}
+                                <div style="display: flex; gap: 5px; align-items: center;">
+                                    {% set is_banned = u.banned if u.banned is defined else False %}
+                                    {% if is_banned %}
+                                        <form method="POST" action="{{ url_for('admin_unban_user', username_to_unban=u.username) }}" style="display:inline; margin: 0;">
+                                            <button type="submit" style="background-color: #28a745; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; white-space: nowrap;">Unban</button>
+                                        </form>
+                                    {% else %}
+                                        <form method="POST" action="{{ url_for('admin_ban_user', username_to_ban=u.username) }}" style="display:inline; margin: 0;">
+                                            <button type="submit" onclick="return confirm('Ban user {{ u.username }}? They will not be able to log in.')" style="background-color: #dc3545; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; white-space: nowrap;">Ban</button>
+                                        </form>
+                                    {% endif %}
+                                    <form method="POST" action="{{ url_for('admin_delete_user', username_to_delete=u.username) }}" style="display:inline; margin: 0;">
+                                        <button type="submit" onclick="return confirm('Delete user {{ u.username }}? This will remove their messages and update favorites.')" style="background-color: #6c757d; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; white-space: nowrap;">Delete</button>
+                                    </form>
+                                </div>
+                            {% else %}
+                                <em>Protected</em>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </main>
+{% endblock %}

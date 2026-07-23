@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='icon.png') }}" type="image/png">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/ico">
+    <script src="{{ url_for('static', filename='js/password_toggle.js') }}?v=1"></script>
+    <script src="{{ url_for('static', filename='js/search.js') }}?v=1"></script>
+    <script src="{{ url_for('static', filename='js/private_message_search.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/hide_from.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/reload_pms.js') }}"></script>
+    <title>{% block title %}Message Board{% endblock %}</title>
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <header class="topbar">
+        <div class="topbar-inner">
+            <a class="logo" href="{{ url_for('home') }}">Message Board</a>
+            <nav class="top-nav">
+                {% if 'username' in session %}
+                    <span class="welcome">Welcome, <strong>{{ session['username'] }}</strong></span>
+                    <a href="{{ url_for('logout') }}" id="logout" class="btn btn-ghost">Logout</a>
+                {% else %}
+                    <a href="{{ url_for('login') }}" id="login" class="btn btn-primary">Login</a>
+                    <a href="{{ url_for('signup') }}" id="signup" class="btn btn-outline">Sign Up</a>
+                {% endif %}
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul class="flashes">
+                    {% for category, message in messages %}
+                        <li class="{{ category }}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+    <footer>
+        <p>Copyright &copy; 2025 WillliAm Yao. All rights reserved.</p>
+    </footer>
+    
+    {% if 'username' in session %}
+        {% include 'navbar.html' %}
+    {% endif %}
+
+</body>
+</html>
